@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Tolyo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+  :root {
+    --mario-red: #e52222;
+    --mario-blue: #1a6aff;
+    --mario-yellow: #f7c948;
+    --mario-green: #2ecc40;
+    --mario-dark: #1a0a00;
+    --mario-brown: #7a3b10;
+    --mario-sky: #5c94fc;
+    --mario-cloud: #fff;
+    --pixel: 4px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Press Start 2P', monospace;
+    background-color: var(--mario-sky);
+    color: var(--mario-dark);
+    overflow-x: hidden;
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Crect x='0' y='0' width='4' height='4' fill='%23e52222'/%3E%3Crect x='4' y='0' width='4' height='4' fill='%23e52222'/%3E%3Crect x='8' y='0' width='4' height='4' fill='%23e52222'/%3E%3Crect x='12' y='0' width='4' height='4' fill='%23e52222'/%3E%3Crect x='0' y='4' width='4' height='4' fill='%23e52222'/%3E%3Crect x='4' y='4' width='4' height='4' fill='%23f7c948'/%3E%3Crect x='8' y='4' width='4' height='4' fill='%23f7c948'/%3E%3Crect x='12' y='4' width='4' height='4' fill='%23e52222'/%3E%3Crect x='0' y='8' width='4' height='4' fill='%23e52222'/%3E%3Crect x='4' y='8' width='4' height='4' fill='%23f7c948'/%3E%3Crect x='8' y='8' width='4' height='4' fill='%23f7c948'/%3E%3Crect x='12' y='8' width='4' height='4' fill='%23e52222'/%3E%3Crect x='0' y='12' width='4' height='4' fill='%23e52222'/%3E%3Crect x='4' y='12' width='4' height='4' fill='%23e52222'/%3E%3Crect x='8' y='12' width='4' height='4' fill='%23e52222'/%3E%3Crect x='12' y='12' width='4' height='4' fill='%23e52222'/%3E%3C/svg%3E"), auto;
+  }
+
+  /* ====== ANIMATED SKY BACKGROUND ====== */
+  .sky-bg {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(180deg, #3d9bff 0%, #7ec8ff 55%, #a8e0ff 80%, #c8f0ff 100%);
+    z-index: -10;
+  }
+
+  /* Pixel clouds */
+  .clouds {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 60%;
+    z-index: -9;
+    pointer-events: none;
+  }
+
+  .cloud {
+    position: absolute;
+    image-rendering: pixelated;
+    animation: cloudFloat linear infinite;
+    opacity: 0.92;
+  }
+
+  @keyframes cloudFloat {
+    from { transform: translateX(-200px); }
+    to   { transform: translateX(calc(100vw + 200px)); }
+  }
+
+  .c1 { top: 8%;  animation-duration: 40s; animation-delay: -5s;  width: 120px; }
+  .c2 { top: 18%; animation-duration: 55s; animation-delay: -20s; width: 80px;  }
+  .c3 { top: 30%; animation-duration: 48s; animation-delay: -35s; width: 140px; }
+  .c4 { top: 12%; animation-duration: 62s; animation-delay: -10s; width: 100px; }
+  .c5 { top: 25%; animation-duration: 35s; animation-delay: -50s; width: 90px;  }
+
+  /* Ground layer */
+  .ground-strip {
+    position: fixed;
+    bottom: 0; left: 0; width: 100%;
+    height: 64px;
+    z-index: -8;
+    background: repeating-linear-gradient(
+      90deg,
+      #2ecc40 0px, #2ecc40 64px,
+      #27ae34 64px, #27ae34 128px
+    );
+    border-top: 8px solid #1a8c28;
+    box-shadow: inset 0 8px 0 #3ddf50;
+  }
+
+  /* Pixel bricks at bottom */
+  .brick-row {
+    position: fixed;
+    bottom: 64px; left: 0; width: 100%;
+    height: 32px;
+    z-index: -7;
+    background: repeating-linear-gradient(
+      90deg,
+      #c84b00 0px, #c84b00 62px,
+      #8b3300 62px, #8b3300 64px
+    );
+    border-top: 4px solid #ff6a00;
+    border-bottom: 4px solid #8b3300;
+  }
+
+  /* Stars (at night) */
+  .stars {
+    position: fixed; inset: 0; z-index: -10;
+    pointer-events: none;
+  }
+
+  /* ====== NAVBAR ====== */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--mario-red);
+    border-bottom: 6px solid #8b0000;
+    box-shadow: 0 6px 0 #ff6060, 0 12px 0 #8b0000;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    image-rendering: pixelated;
+  }
+
+  .nav-logo {
+    font-size: 11px;
+    color: var(--mario-yellow);
+    text-shadow: 2px 2px 0 #8b6000, -1px -1px 0 #8b6000;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .coin-spin {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: var(--mario-yellow);
+    border-radius: 50%;
+    border: 3px solid #a07800;
+    animation: coinSpin 1.5s linear infinite;
+    box-shadow: inset -3px 0 0 #a07800;
+  }
+
+  @keyframes coinSpin {
+    0%   { transform: scaleX(1); }
+    25%  { transform: scaleX(0.3); }
+    50%  { transform: scaleX(1); }
+    75%  { transform: scaleX(0.3); }
+    100% { transform: scaleX(1); }
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 4px;
+    list-style: none;
+    flex-wrap: wrap;
+  }
+
+  .nav-links a {
+    display: block;
+    padding: 6px 10px;
+    font-size: 11px;
+    color: #fff;
+    text-decoration: none;
+    border: 3px solid transparent;
+    transition: all 0.1s;
+    letter-spacing: 0.5px;
+    text-shadow: 1px 1px 0 #800;
+    position: relative;
+    top: 0;
+  }
+
+  .nav-links a:hover {
+    background: var(--mario-yellow);
+    color: var(--mario-dark);
+    border-color: #8b6000;
+    box-shadow: 3px 3px 0 #8b6000;
+    top: -2px;
+    text-shadow: 1px 1px 0 #a07800;
+  }
+
+  /* Sound button */
+  .sound-btn {
+    width: 32px;
+    height: 32px;
+    background: var(--mario-yellow);
+    border: 3px solid #8b6000;
+    box-shadow: 2px 2px 0 #8b6000;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.1s;
+    position: relative;
+    top: 0;
+    padding: 0;
+  }
+
+  .sound-btn:hover {
+    top: -2px;
+    box-shadow: 3px 3px 0 #8b6000;
+  }
+
+  .sound-btn:active {
+    top: 1px;
+    box-shadow: 1px 1px 0 #8b6000;
+  }
+
+  .sound-btn.muted {
+    background: #666;
+    border-color: #333;
+    box-shadow: 2px 2px 0 #333;
+  }
+
+  .sound-btn.muted:hover {
+    box-shadow: 3px 3px 0 #333;
+  }
+
+  /* ====== HERO ====== */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px 10px;
+    position: relative;
+    gap: 0;
+
+  }
+
+  /* Pixel title */
+  .pixel-title {
+    font-size: clamp(18px, 4vw, 42px);
+    color: var(--mario-yellow);
+    text-shadow:
+      4px 4px 0 #8b6000,
+      -2px -2px 0 #8b6000,
+      8px 8px 0 rgba(0,0,0,0.3);
+    letter-spacing: 4px;
+    animation: titleBounce 2s ease-in-out infinite;
+    text-align: center;
+    line-height: 1.4;
+    position: relative;
+    z-index: 2;
+    margin-bottom: -10px;
+  }
+
+  @keyframes titleBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .title-stars {
+    display: inline-block;
+    animation: starSpin 1s linear infinite;
+  }
+  @keyframes starSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  /* Character box */
+  .character-zone {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 40px;
+  }
+
+  .character-platform {
+    width: 180px;
+    height: 12px;
+    background: repeating-linear-gradient(90deg, #c84b00 0px, #c84b00 44px, #8b3300 44px, #8b3300 48px);
+    border-top: 4px solid #ff6a00;
+    border-bottom: 4px solid #8b3300;
+    margin-top: -4px;
+    border-radius: 0 0 4px 4px;
+  }
+
+
+
+
+
+  @keyframes questionPulse {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 0.9; transform: scale(1.1); }
+  }
+
+
+  /* Floating coins above character */
+  .floating-coins {
+    position: absolute;
+    top: -60px;
+    display: flex;
+    gap: 12px;
+  }
+
+  .float-coin {
+    width: 16px; height: 16px;
+    background: var(--mario-yellow);
+    border-radius: 50%;
+    border: 2px solid #a07800;
+    box-shadow: inset -3px 0 0 #a07800;
+    animation: floatCoin 1.5s ease-in-out infinite;
+  }
+  .float-coin:nth-child(2) { animation-delay: 0.2s; }
+  .float-coin:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes floatCoin {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+
+  /* ====== GAME FRAME ====== */
+  .game-section {
+    padding: 80px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+
+  }
+
+  .section-label {
+    font-size: 10px;
+    color: var(--mario-yellow);
+    text-shadow: 2px 2px 0 #8b6000;
+    letter-spacing: 3px;
+    text-align: center;
+    animation: blink 1.5s step-end infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .game-frame-outer {
+    position: relative;
+    padding: 12px;
+    background: var(--mario-yellow);
+    box-shadow:
+      0 0 0 6px #8b6000,
+      0 0 0 12px var(--mario-red),
+      0 0 0 18px #8b0000,
+      12px 12px 0 18px rgba(0,0,0,0.4);
+    image-rendering: pixelated;
+    border-radius: 2px;
+    margin-bottom: 60px;
+  }
+
+  .game-frame-inner {
+    width: min(70vw);
+    height: min(80vh);
+    background: #0a0a1a;
+    border: 4px solid #222;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
+    image-rendering: pixelated;
+
+  }
+
+  .game-frame-inner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 3px,
+      rgba(255,255,255,0.02) 3px,
+      rgba(255,255,255,0.02) 4px
+    );
+    pointer-events: none;
+  }
+
+  .game-placeholder-text {
+    font-size: clamp(8px, 2vw, 14px);
+    color: var(--mario-green);
+    text-shadow: 0 0 10px #2ecc40;
+    letter-spacing: 2px;
+    text-align: center;
+    animation: glow 2s ease-in-out infinite;
+  }
+  .game-placeholder-sub {
+    font-size: clamp(5px, 1.2vw, 8px);
+    color: rgba(46,204,64,0.6);
+    letter-spacing: 1px;
+    text-align: center;
+  }
+  @keyframes glow {
+    0%, 100% { text-shadow: 0 0 10px #2ecc40; }
+    50% { text-shadow: 0 0 24px #2ecc40, 0 0 40px #2ecc40; }
+  }
+
+  /* Decorative corner pieces */
+  .corner {
+    position: absolute;
+    width: 24px; height: 24px;
+    background: var(--mario-red);
+    box-shadow: 0 0 0 3px #8b0000;
+  }
+  .corner.tl { top: -6px; left: -6px; }
+  .corner.tr { top: -6px; right: -6px; }
+  .corner.bl { bottom: -6px; left: -6px; }
+  .corner.br { bottom: -6px; right: -6px; }
+
+  /* Lives indicator on frame */
+  .frame-lives {
+    position: absolute;
+    top: -38px; left: 0;
+    font-size: 7px;
+    color: var(--mario-dark);
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .frame-score {
+    position: absolute;
+    top: -38px; right: 0;
+    font-size: 7px;
+    color: var(--mario-dark);
+    letter-spacing: 1px;
+  }
+
+  /* ====== ABOUT SECTION ====== */
+  .about-section {
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .section-title {
+    font-size: clamp(12px, 3vw, 22px);
+    color: var(--mario-yellow);
+    text-shadow: 3px 3px 0 #8b6000, -1px -1px 0 #8b6000;
+    text-align: center;
+    position: relative;
+    display: inline-block;
+  }
+
+  .section-title::before,
+  .section-title::after {
+    content: '★';
+    color: var(--mario-red);
+    margin: 0 12px;
+    text-shadow: 2px 2px 0 #8b0000;
+  }
+
+  .about-card {
+    max-width: 700px;
+    width: 100%;
+    background: rgba(137,0,191,0.39);
+    border: 4px solid var(--mario-yellow);
+    box-shadow: 6px 6px 0 #8b6000, 0 0 0 2px #8b6000;
+    padding: 32px;
+    position: relative;
+    backdrop-filter: blur(4px);
+  }
+
+  .about-card::before {
+    content: '';
+    position: absolute;
+    top: -8px; left: 16px;
+    width: 48px; height: 8px;
+    background: var(--mario-yellow);
+  }
+
+  .about-text {
+    font-size: clamp(6px, 1.2vw, 12px);
+    color: #fff;
+    line-height: 2;
+    text-align: center;
+    letter-spacing: 0.5px;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+  }
+
+  /* ====== CONTRACT ADDRESS ====== */
+  .ca-section {
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .ca-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--mario-dark);
+    border: 4px solid var(--mario-yellow);
+    box-shadow: 4px 4px 0 #8b6000;
+    padding: 16px 24px;
+    max-width: 700px;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ca-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: repeating-linear-gradient(90deg, var(--mario-yellow) 0px, var(--mario-yellow) 8px, transparent 8px, transparent 16px);
+  }
+
+  .ca-label {
+    font-size: 8px;
+    color: var(--mario-yellow);
+    letter-spacing: 2px;
+    white-space: nowrap;
+  }
+
+  .ca-address {
+    font-size: clamp(5px, 1vw, 7px);
+    color: var(--mario-green);
+    letter-spacing: 1px;
+    word-break: break-all;
+    text-align: center;
+    text-shadow: 0 0 8px #2ecc40;
+    cursor: pointer;
+    transition: all 0.1s;
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .ca-address:hover {
+    color: #fff;
+    text-shadow: 0 0 16px #2ecc40;
+  }
+
+  .copy-btn {
+    background: var(--mario-red);
+    border: 3px solid #8b0000;
+    box-shadow: 3px 3px 0 #8b0000;
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    transition: all 0.1s;
+  }
+  .copy-btn:hover {
+    background: #ff3333;
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 #8b0000;
+  }
+  .copy-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 #8b0000;
+  }
+
+  /* ====== LINKS SECTION ====== */
+  .links-section {
+    padding: 60px 20px 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .links-grid {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 700px;
+  }
+
+  .link-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 20px;
+    text-decoration: none;
+    min-width: 140px;
+    background: var(--mario-dark);
+    border: 4px solid;
+    position: relative;
+    top: 0;
+    transition: all 0.1s;
+    cursor: pointer;
+  }
+
+  .link-card:nth-child(1) { border-color: #1da1f2; box-shadow: 4px 4px 0 #0d6fa6; }
+  .link-card:nth-child(2) { border-color: #0088cc; box-shadow: 4px 4px 0 #005a88; }
+  .link-card:nth-child(3) { border-color: var(--mario-green); box-shadow: 4px 4px 0 #1a8c28; }
+
+  .link-card:hover {
+    top: -6px;
+    transform: none;
+  }
+  .link-card:nth-child(1):hover { box-shadow: 8px 10px 0 #0d6fa6; }
+  .link-card:nth-child(2):hover { box-shadow: 8px 10px 0 #005a88; }
+  .link-card:nth-child(3):hover { box-shadow: 8px 10px 0 #1a8c28; }
+
+  .link-icon {
+    font-size: 32px;
+    image-rendering: pixelated;
+  }
+
+  .link-label {
+    font-size: 7px;
+    color: #fff;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 0 #000;
+    text-align: center;
+  }
+
+  /* Pixel icon for Twitter/X */
+  .px-icon {
+    width: 40px;
+    height: 40px;
+    image-rendering: pixelated;
+    display: block;
+  }
+
+  /* ====== PIXEL ART DECORATIONS ====== */
+  .question-block {
+    display: inline-block;
+    width: 48px; height: 48px;
+    background: var(--mario-yellow);
+    border: 4px solid #8b6000;
+    box-shadow: inset -4px -4px 0 #a07800, inset 4px 4px 0 #ffe55c;
+    position: relative;
+    animation: blockBounce 0.5s ease infinite alternate;
+    cursor: pointer;
+  }
+  .question-block::after {
+    content: '?';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--mario-brown);
+    text-shadow: 2px 2px 0 #5a2500;
+  }
+  @keyframes blockBounce {
+    from { transform: translateY(0); }
+    to   { transform: translateY(-6px); }
+  }
+
+  .deco-row {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+
+  /* ====== PIPE ====== */
+  .pipe {
+    width: 48px;
+    background: #27ae34;
+    border-left: 6px solid #1a8c28;
+    border-right: 6px solid #3ddf50;
+    position: relative;
+    height: 80px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .pipe-top {
+    width: 64px;
+    height: 20px;
+    background: #27ae34;
+    border: 4px solid #1a8c28;
+    border-radius: 2px;
+    box-shadow: inset 0 4px 0 #3ddf50, 0 4px 0 #1a8c28;
+    margin-top: -10px;
+    margin-left: -8px;
+  }
+
+  /* ====== COIN COUNTER ====== */
+  .coin-counter {
+    position: fixed;
+    top: 80px; right: 20px;
+    background: rgba(0,0,0,0.7);
+    border: 3px solid var(--mario-yellow);
+    box-shadow: 3px 3px 0 #8b6000;
+    padding: 10px 14px;
+    font-size: 7px;
+    color: var(--mario-yellow);
+    letter-spacing: 1px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(4px);
+  }
+
+  /* ====== FOOTER ====== */
+  footer {
+    background: var(--mario-dark);
+    border-top: 6px solid var(--mario-red);
+    padding: 40px 20px;
+    text-align: center;
+    position: relative;
+    z-index: 5;
+  }
+
+  footer p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    line-height: 2.5;
+    letter-spacing: 1px;
+  }
+
+  /* ====== SCROLLING GROUND ELEMENTS ====== */
+  .ground-elements {
+    position: fixed;
+    bottom: 96px; left: 0; width: 100%;
+    height: 60px;
+    pointer-events: none;
+    z-index: -6;
+    display: flex;
+    animation: groundScroll 20s linear infinite;
+    white-space: nowrap;
+  }
+  @keyframes groundScroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* ====== RESPONSIVE ====== */
+  @media (max-width: 600px) {
+    nav { height: auto; padding: 10px 12px; flex-direction: column; gap: 8px; }
+    .nav-links { justify-content: center; }
+    .game-frame-inner { min-height: 220px; }
+    .about-card { padding: 20px; }
+    .link-card { min-width: 100px; padding: 16px 12px; }
+  }
+</style>
+</head>
+<body>
+<audio id="bgMusic" loop>
+  <source src="soundtrack.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+  // Try to play on load
+  window.addEventListener('load', () => {
+    const audio = document.getElementById('bgMusic');
+    audio.play().catch(() => {
+      // If autoplay fails, play on first user interaction
+      document.addEventListener('click', () => {
+        audio.play();
+      }, { once: true });
+    });
+  });
+</script>
+<!-- Sky background -->
+<div class="sky-bg"></div>
+
+<!-- Animated clouds -->
+<div class="clouds">
+  <svg class="cloud c1" viewBox="0 0 120 50" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+    <rect x="16" y="32" width="88" height="16" fill="white"/>
+    <rect x="8" y="24" width="104" height="16" fill="white"/>
+    <rect x="24" y="16" width="32" height="16" fill="white"/>
+    <rect x="56" y="8" width="32" height="16" fill="white"/>
+    <rect x="16" y="32" width="88" height="4" fill="#eee"/>
+  </svg>
+  <svg class="cloud c2" viewBox="0 0 80 40" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+    <rect x="8" y="24" width="64" height="14" fill="white"/>
+    <rect x="0" y="16" width="80" height="12" fill="white"/>
+    <rect x="16" y="8" width="24" height="12" fill="white"/>
+    <rect x="40" y="4" width="24" height="12" fill="white"/>
+  </svg>
+  <svg class="cloud c3" viewBox="0 0 140 55" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+    <rect x="0" y="36" width="140" height="18" fill="white"/>
+    <rect x="8" y="24" width="120" height="16" fill="white"/>
+    <rect x="24" y="12" width="40" height="16" fill="white"/>
+    <rect x="72" y="8" width="40" height="18" fill="white"/>
+  </svg>
+  <svg class="cloud c4" viewBox="0 0 100 44" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+    <rect x="8" y="28" width="84" height="14" fill="white"/>
+    <rect x="0" y="18" width="100" height="14" fill="white"/>
+    <rect x="16" y="8" width="30" height="14" fill="white"/>
+    <rect x="52" y="4" width="28" height="14" fill="white"/>
+  </svg>
+  <svg class="cloud c5" viewBox="0 0 90 42" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+    <rect x="8" y="26" width="74" height="14" fill="white"/>
+    <rect x="0" y="16" width="90" height="14" fill="white"/>
+    <rect x="20" y="6" width="26" height="14" fill="white"/>
+    <rect x="50" y="2" width="26" height="16" fill="white"/>
+  </svg>
+</div>
+
+<!-- Ground -->
+<div class="ground-strip"></div>
+<div class="brick-row"></div>
+
+<!-- Coin Counter -->
+<div class="coin-counter">
+  <div class="coin-spin"></div>
+  <span id="coinCount">×000</span>
+  <button class="sound-btn muted" id="soundToggle" onclick="toggleSound()">🔇</button>
+</div>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo">
+    <div class="coin-spin"></div>
+    SUPER TOLYO
+  </div>
+  <ul class="nav-links">
+    <li><a href="#about">ABOUT</a></li>
+    <li><a href="#contract">CA</a></li>
+    <li><a href="#dex">DEXSCREENER</a></li>
+    <li><a href="#telegram">TELEGRAM</a></li>
+    <li><a href="#twitter">TWITTER</a></li>
+  </ul>
+</nav>
+
+<!-- Background Music -->
+<audio id="bgMusic" loop>
+  <source src="soundtrack.mp3" type="audio/mpeg">
+</audio>
+
+<!-- HERO -->
+<section class="hero">
+
+  <div class="deco-row" style="margin-bottom:24px">
+    <div class="question-block" onclick="popCoin(this)"></div>
+    <div class="question-block" onclick="popCoin(this)" style="animation-delay:0.2s"></div>
+    <div class="question-block" onclick="popCoin(this)" style="animation-delay:0.4s"></div>
+  </div>
+
+  <!-- PIXEL TITLE -->
+  <div class="pixel-title">
+    <span class="title-stars">★</span>
+    SUPER TOLYO
+    <span class="title-stars">★</span>
+  </div>
+
+  <!-- CHARACTER ZONE -->
+<!--  <div class="character-zone">-->
+<!--    <div class="floating-coins">-->
+<!--      <div class="float-coin"></div>-->
+<!--      <div class="float-coin"></div>-->
+<!--      <div class="float-coin"></div>-->
+<!--    </div>-->
+<!--    <div class="character-frame">-->
+<!--      &lt;!&ndash; Place your character sprite here &ndash;&gt;-->
+<!--    </div>-->
+<!--    <img src="/images/characxter.png" style="margin-top:100px;width:700px;animation: titleBounce 2.5s ease-in-out infinite;">-->
+<!--  </div>-->
+<section class="game-section" id="game">
+
+
+  <div class="game-frame-outer">
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
+    <div class="frame-lives">♥ ♥ ♥  TOLYO</div>
+    <div class="game-frame-inner" style="padding:0;">
+  <iframe src="./game/1/2/3/index.html" style="width:100%;height:100%;border:none;display:block;image-rendering:pixelated;" allowfullscreen></iframe>
+</div>
+  </div>
+  <img src="/images/pump.png"style="
+    width: 400px;margin-right: 800px;
+">
+  <img src="/images/pump2.png"style="
+     margin-top: -400px;
+    width: 450px;
+    margin-right: 50px;
+">
+  <img src="/images/pump3.png"style="
+    margin-top: -500px;
+     width: 450px;
+     margin-right: -700px;
+">
+</section>
+</section>
+
+<!-- GAME FRAME -->
+
+
+<!-- ABOUT -->
+<section class="about-section" id="about">
+  <div class="section-title">ABOUT</div>
+  <div class="about-card">
+    <p class="about-text">
+      WELCOME TO SUPER TOLYO — THE MOST LEGENDARY<br>
+      MEMECOIN IN THE MUSHROOM KINGDOM!<br><br>
+      BORN FROM PIXELS AND POWERED BY THE COMMUNITY,<br>
+      SUPER TOLYO IS HERE TO TAKE YOU ON AN EPIC QUEST<br>
+      THROUGH THE CRYPTO WORLD.<br><br>
+      COLLECT COINS. BREAK BRICKS. HODL FOREVER. 🍄
+    </p>
+  </div>
+</section>
+
+<!-- CONTRACT ADDRESS -->
+<section class="ca-section" id="contract">
+  <div class="section-title">CONTRACT ADDRESS</div>
+  <div class="ca-box">
+    <span class="ca-label">CA:</span>
+    <span class="ca-address" id="caAddress" onclick="copyCA()">
+      DJy3VrsZMa2SrQTyH5seQ1a3E99Wx3UfN95jxC2Spump
+    </span>
+    <button class="copy-btn" onclick="copyCA()">COPY</button>
+  </div>
+</section>
+
+<!-- LINKS -->
+<section class="links-section" id="dex">
+  <div class="section-title">JOIN THE QUEST</div>
+
+  <div class="links-grid">
+    <!-- DEXSCREENER -->
+    <a class="link-card" href="https://dexscreener.com/solana/8naqq8jusfrn7qsdumff7z17e2usbgnw2dzohap345eb" target="_blank" id="dexscreener">
+      <img src="/images/dex.png" style="margin-top: -15px; width: 77px;">
+
+      </svg>
+      <span class="link-label">DEXSCREENER</span>
+    </a>
+
+    <!-- TELEGRAM -->
+    <a class="link-card" href="https://t.me/Super_Tolyo" target="_blank" id="telegram">
+      <svg class="px-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+        <rect width="40" height="40" fill="#0088cc"/>
+        <polygon points="4,18 36,6 26,34 18,24" fill="white"/>
+        <polygon points="18,24 26,34 20,22" fill="#ccc"/>
+        <rect x="12" y="19" width="8" height="4" fill="white" transform="rotate(-30 16 21)"/>
+      </svg>
+      <span class="link-label" id="telegram-label" style="margin-top:10px;" >TELEGRAM</span>
+    </a>
+
+    <!-- TWITTER -->
+    <a class="link-card" href="https://x.com/Super_Tolyo" target="_blank" id="twitter">
+      <svg class="px-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+        <rect width="40" height="40" fill="#000"/>
+        <!-- X logo pixel art -->
+        <rect x="6" y="6" width="4" height="4" fill="white"/>
+        <rect x="10" y="10" width="4" height="4" fill="white"/>
+        <rect x="14" y="14" width="4" height="4" fill="white"/>
+        <rect x="18" y="18" width="4" height="4" fill="white"/>
+        <rect x="22" y="14" width="4" height="4" fill="white"/>
+        <rect x="26" y="10" width="4" height="4" fill="white"/>
+        <rect x="30" y="6" width="4" height="4" fill="white"/>
+        <rect x="22" y="22" width="4" height="4" fill="white"/>
+        <rect x="26" y="26" width="4" height="4" fill="white"/>
+        <rect x="30" y="30" width="4" height="4" fill="white"/>
+        <rect x="6" y="30" width="4" height="4" fill="white"/>
+        <rect x="10" y="26" width="4" height="4" fill="white"/>
+        <rect x="14" y="22" width="4" height="4" fill="white"/>
+      </svg>
+      <span class="link-label" id="twitter-label"style="margin-top:10px;">TWITTER / X</span>
+    </a>
+  </div>
+
+  <div class="deco-row" style="margin-top:20px">
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div class="pipe-top"></div>
+      <div class="pipe"></div>
+    </div>
+    <div class="question-block" onclick="popCoin(this)"></div>
+    <div class="question-block" onclick="popCoin(this)" style="animation-delay:0.3s"></div>
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div class="pipe-top"></div>
+      <div class="pipe"></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 SUPER TOLYO · ALL RIGHTS RESERVED · GAME OVER? NEVER.</p>
+  <p style="margin-top:12px">♥ ♥ ♥ &nbsp; MADE WITH PIXELS AND PASSION &nbsp; ♥ ♥ ♥</p>
+</footer>
+
+<script>
+  // Coin counter
+  let coins = 0;
+  const coinDisplay = document.getElementById('coinCount');
+
+  function addCoin(n = 1) {
+    coins += n;
+    coinDisplay.textContent = '×' + String(coins).padStart(3, '0');
+  }
+
+  // Sound toggle
+  const bgMusic = document.getElementById('bgMusic');
+  const soundBtn = document.getElementById('soundToggle');
+  let isMuted = true;
+
+  function toggleSound() {
+    if (isMuted) {
+      bgMusic.play().catch(err => console.log('Play failed:', err));
+      soundBtn.textContent = '🔊';
+      soundBtn.classList.remove('muted');
+      isMuted = false;
+    } else {
+      bgMusic.pause();
+      soundBtn.textContent = '🔇';
+      soundBtn.classList.add('muted');
+      isMuted = true;
+    }
+  }
+
+  // Question block pop
+  function popCoin(el) {
+    el.style.background = '#c8a000';
+    el.style.animation = 'none';
+    setTimeout(() => {
+      el.style.background = '';
+      el.style.animation = '';
+    }, 600);
+
+    // Spawn floating coin
+    const coin = document.createElement('div');
+    coin.style.cssText = `
+      position:fixed;
+      width:16px;height:16px;
+      background:var(--mario-yellow);
+      border-radius:50%;
+      border:2px solid #a07800;
+      box-shadow: inset -2px 0 0 #a07800;
+      pointer-events:none;
+      z-index:999;
+      transition: transform 0.6s ease-out, opacity 0.6s ease-out;
+    `;
+    const rect = el.getBoundingClientRect();
+    coin.style.left = rect.left + rect.width/2 - 8 + 'px';
+    coin.style.top = rect.top - 8 + 'px';
+    document.body.appendChild(coin);
+    requestAnimationFrame(() => {
+      coin.style.transform = 'translateY(-60px)';
+      coin.style.opacity = '0';
+    });
+    setTimeout(() => coin.remove(), 700);
+    addCoin(1);
+  }
+
+  // Copy CA
+  function copyCA() {
+    const addr = document.getElementById('caAddress').textContent.trim();
+    navigator.clipboard.writeText(addr).catch(() => {});
+    const btn = document.querySelector('.copy-btn');
+    const orig = btn.textContent;
+    btn.textContent = 'COPIED!';
+    btn.style.background = 'var(--mario-green)';
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.style.background = '';
+    }, 1500);
+    addCoin(5);
+  }
+
+  // Auto coin counter
+  setInterval(() => addCoin(1), 3000);
+
+  // Pixel trail on mouse
+  document.addEventListener('mousemove', (e) => {
+    if (Math.random() > 0.85) {
+      const spark = document.createElement('div');
+      spark.style.cssText = `
+        position:fixed;
+        left:${e.clientX-2}px;top:${e.clientY-2}px;
+        width:4px;height:4px;
+        background:var(--mario-yellow);
+        pointer-events:none;
+        z-index:999;
+        transition: all 0.4s ease-out;
+        image-rendering:pixelated;
+      `;
+      document.body.appendChild(spark);
+      requestAnimationFrame(() => {
+        spark.style.transform = `translate(${(Math.random()-0.5)*20}px, -${8+Math.random()*12}px)`;
+        spark.style.opacity = '0';
+      });
+      setTimeout(() => spark.remove(), 450);
+    }
+  });
+</script>
+</body>
+</html>
